@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id        String   @id @default(cuid())
+  label     String
+  image_url String?
+  public_id String?
+  created   DateTime @default(now())
+  updated   DateTime @updatedAt
+}
+
+model Category {
+  id            String        @id @default(cuid())
+  label         String
+  slug          String        @unique
+  image_url     String?
+  public_id     String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  subCategories SubCategory[] @relation("CategoryToSubCategory")
+}
+
+model SubCategory {
+  id         String    @id @default(cuid())
+  label      String
+  slug       String    @unique
+  categoryId String?
+  category   Category? @relation("CategoryToSubCategory", fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([categoryId])
+}
+
+model Origin {
+  id      String   @id @default(cuid())
+  label   String
+  created DateTime @default(now())
+  updated DateTime @updatedAt
+}
+
+model Color {
+  id      String   @id @default(cuid())
+  label   String
+  hex     String
+  created DateTime @default(now())
+  updated DateTime @updatedAt
+}
+
+model Size {
+  id      String   @id @default(cuid())
+  label   String
+  value   String
+  created DateTime @default(now())
+  updated DateTime @updatedAt
+}
