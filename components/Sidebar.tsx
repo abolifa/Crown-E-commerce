@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Globe,
   Layers,
   LayoutDashboard,
   Network,
+  Package,
   Palette,
   Scissors,
   Tag,
@@ -50,17 +51,21 @@ const links = [
     icon: Network,
     href: "/subcategories",
   },
+  {
+    label: "Products",
+    icon: Package,
+    href: "/products",
+  },
 ];
 
 const Sidebar = () => {
   const pathname = usePathname();
   return (
-    <div
-      className="w-auto h-[calc(100vh-3.5rem)] sticky top-0 text-muted-foreground left-0 p-5 border-r shadow 
-    flex flex-col items-start justify-start gap-4"
-    >
+    <div className="w-auto h-full sticky top-0 text-muted-foreground left-0 p-5 border-r flex flex-col items-start justify-start gap-4">
       {links.map((link) => {
-        const isActive = link.href === pathname;
+        const isActive =
+          (link.href !== "/" && pathname.startsWith(link.href)) ||
+          (link.href === "/" && pathname === "/");
         return (
           <Link
             key={link.href}
@@ -74,16 +79,8 @@ const Sidebar = () => {
                   "bg-primary text-primary-foreground hover:text-primary-foreground"
               )}
             >
-              <link.icon className="w-5 h-5" />
+              <link.icon className="w-6 h-6" />
             </div>
-            <p
-              className={cn(
-                "text-sm",
-                isActive && "hover:text-primary text-primary"
-              )}
-            >
-              {link.label}
-            </p>
           </Link>
         );
       })}

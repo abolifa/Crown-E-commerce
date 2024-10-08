@@ -13,11 +13,11 @@ export const queryClient = new QueryClient();
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="w-screen h-screen overflow-x-hidden flex flex-col">
-        <Navbar />
-        <div className="flex w-full">
-          <Sidebar />
-          <div className="flex-1 p-5">{children}</div>
+      <div className="w-screen h-screen flex">
+        <Sidebar />
+        <div className="w-full h-full">
+          <Navbar />
+          <div className="p-5 bg-muted h-full">{children}</div>
         </div>
       </div>
     </QueryClientProvider>

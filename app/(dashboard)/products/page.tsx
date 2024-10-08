@@ -11,10 +11,10 @@ import Loader from "@/components/Loader";
 
 const page = () => {
   const { data, isPending, error, isError } = useQuery({
-    queryKey: ["subcategories"],
+    queryKey: ["products"],
     queryFn: async () => {
-      const subcategories = await axios.get("/api/subcategories");
-      return subcategories.data;
+      const products = await axios.get("/api/products");
+      return products.data;
     },
   });
 
@@ -25,9 +25,9 @@ const page = () => {
   return (
     <div className="space-y-4">
       <Heading
-        title="SubCategories"
-        description="Manage all subcategories inside your store"
-        action="subcategories"
+        title="Products"
+        description="Manage all products inside your store"
+        action="products"
         count={0}
       />
       <Separator />

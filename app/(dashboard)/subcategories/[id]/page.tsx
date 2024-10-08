@@ -18,51 +18,60 @@ import { Input } from "@/components/ui/input";
 import FormHeading from "@/components/FormHeading";
 import { Separator } from "@/components/ui/separator";
 import axios from "axios";
-import { Brand } from "@prisma/client";
-import ImageUpload from "@/components/ImageUpload";
+import { Category, SubCategory } from "@prisma/client";
 import toast from "react-hot-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   label: z.string().min(2).max(50),
-  image_url: z.string().url().min(2),
-  public_id: z.string().min(1),
+  slug: z.string().min(2).max(50),
+  categoryId: z.string().min(2).max(50),
 });
 
 const Page = () => {
   const { id } = useParams();
-  const [record, setRecord] = useState<Brand | null>(null);
+  const [record, setRecord] = useState<SubCategory | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const title = record ? "Edit Brand" : "Create Brand";
+  const title = record ? "Edit SubCategory" : "Create SubCategory";
   const description = record
-    ? "Edit existing brand on the store"
-    : "Add new brand to the store";
+    ? "Edit existing SubCategory on the store"
+    : "Add new SubCategory to the store";
   const buttonAction = record ? "Update" : "Create";
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       label: "",
-      image_url: "",
-      public_id: "",
+      slug: "",
+      categoryId: "",
     },
   });
 
   useEffect(() => {
-    // Fetch the brand record if editing
+    // Fetch the SubCategory record if editing
     const fetchData = async () => {
       if (id) {
         setLoading(true);
         try {
-          const response = await axios.get(`/api/brands/${id}`);
+          const response = await axios.get(`/api/subcategories/${id}`);
+          const categories = await axios.get("/api/categories");
           if (response.status === 200) {
             setRecord(response.data);
+            setCategories(categories.data);
             form.reset(response.data);
           }
         } catch (error) {
-          console.error("Error fetching brand:", error);
-          toast.error("Failed to fetch brand data");
+          console.error("Error fetching SubCategory:", error);
+          toast.error("Failed to fetch SubCategory data");
         } finally {
           setLoading(false);
         }
@@ -75,13 +84,13 @@ const Page = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       if (!record) {
-        await axios.post("/api/brands", values);
-        toast.success("Brand created successfully");
-        router.push("/brands");
+        await axios.post("/api/subcategories", values);
+        toast.success("SubCategory created successfully");
+        router.push("/subcategories");
       } else {
-        await axios.put(`/api/brands/${id}`, values);
-        toast.success("Brand updated successfully");
-        router.push("/brands");
+        await axios.put(`/api/subcategories/${id}`, values);
+        toast.success("SubCategory updated successfully");
+        router.push("/subcategories");
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -94,7 +103,7 @@ const Page = () => {
       <FormHeading
         title={title}
         description={description}
-        action={"brands"}
+        action={"subcategories"}
         id={record ? (record.id as string) : null}
       />
       <Separator />
@@ -106,7 +115,7 @@ const Page = () => {
               name="label"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Brand Label</FormLabel>
+                  <FormLabel>Label</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -116,33 +125,41 @@ const Page = () => {
             />
             <FormField
               control={form.control}
-              name="image_url"
+              name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image</FormLabel>
+                  <FormLabel>Slug</FormLabel>
                   <FormControl>
-                    <ImageUpload
-                      value={
-                        field.value
-                          ? [
-                              {
-                                image_url: field.value,
-                                public_id: form.getValues("public_id"),
-                              },
-                            ]
-                          : []
-                      }
-                      disabled={loading}
-                      onChange={({ image_url, public_id }) => {
-                        field.onChange(image_url);
-                        form.setValue("public_id", public_id);
-                      }}
-                      onRemove={() => {
-                        field.onChange("");
-                        form.setValue("public_id", "");
-                      }}
-                    />
+                    <Input {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="categoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={category.id.toString()}
+                        >
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

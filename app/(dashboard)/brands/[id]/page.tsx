@@ -24,8 +24,8 @@ import toast from "react-hot-toast";
 
 const formSchema = z.object({
   label: z.string().min(2).max(50),
-  image_url: z.string().url().min(2),
-  public_id: z.string().min(1),
+  image_url: z.string().url().or(z.literal("")),
+  public_id: z.string().min(1).or(z.literal("")),
 });
 
 const Page = () => {
@@ -106,9 +106,9 @@ const Page = () => {
               name="label"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Brand Label</FormLabel>
+                  <FormLabel>Label</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} disabled={loading} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -137,9 +137,21 @@ const Page = () => {
                         field.onChange(image_url);
                         form.setValue("public_id", public_id);
                       }}
-                      onRemove={() => {
-                        field.onChange("");
-                        form.setValue("public_id", "");
+                      onRemove={async () => {
+                        try {
+                          const publicId = form.getValues("public_id");
+
+                          await axios.delete(`/api/destroy/${publicId}`);
+
+                          // Manually update only image-related fields
+                          form.setValue("image_url", "");
+                          form.setValue("public_id", "");
+
+                          toast.success("Image deleted successfully");
+                        } catch (error) {
+                          console.error("Error deleting image:", error);
+                          toast.error("Failed to delete image");
+                        }
                       }}
                     />
                   </FormControl>

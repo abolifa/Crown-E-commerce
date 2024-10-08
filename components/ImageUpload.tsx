@@ -7,8 +7,8 @@ import Image from "next/image";
 import { CldUploadWidget } from "next-cloudinary";
 
 interface Image {
-  image_url: string; // URL of the image
-  public_id: string; // ID from Cloudinary
+  image_url: string;
+  public_id: string;
 }
 
 interface ImageUploadProps {

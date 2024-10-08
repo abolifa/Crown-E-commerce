@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Brand } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Edit, Trash2 } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   AlertDialog,
@@ -36,12 +35,17 @@ export const columns: ColumnDef<Brand>[] = [
     accessorKey: "image_url",
     header: "Image",
     cell: ({ row }) => (
-      <Image
-        src={row.original.image_url ? row.original.image_url : ""}
-        height={40}
-        width={40}
-        alt="Image"
-      />
+      <>
+        {row.original.image_url ? (
+          <img
+            src={row.original.image_url}
+            alt={row.original.label}
+            width={50}
+            height={50}
+            className="rounded-full"
+          />
+        ) : null}
+      </>
     ),
   },
   {

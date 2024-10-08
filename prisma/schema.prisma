@@ -12,8 +12,10 @@ model Brand {
   label     String
   image_url String?
   public_id String?
-  created   DateTime @default(now())
-  updated   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
 }
 
 model Category {
@@ -25,6 +27,8 @@ model Category {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   subCategories SubCategory[] @relation("CategoryToSubCategory")
+
+  products Product[]
 }
 
 model SubCategory {
@@ -36,28 +40,81 @@ model SubCategory {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
+  products Product[]
+
   @@index([categoryId])
 }
 
 model Origin {
-  id      String   @id @default(cuid())
-  label   String
-  created DateTime @default(now())
-  updated DateTime @updatedAt
+  id        String   @id @default(cuid())
+  label     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
 }
 
 model Color {
-  id      String   @id @default(cuid())
-  label   String
-  hex     String
-  created DateTime @default(now())
-  updated DateTime @updatedAt
+  id        String   @id @default(cuid())
+  label     String
+  hex       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  variations Variation[]
 }
 
 model Size {
-  id      String   @id @default(cuid())
-  label   String
-  value   String
-  created DateTime @default(now())
-  updated DateTime @updatedAt
+  id        String   @id @default(cuid())
+  label     String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  variations Variation[]
+}
+
+model Product {
+  id              String       @id @default(cuid())
+  name            String
+  description     String?
+  featured        Boolean      @default(false)
+  archived        Boolean      @default(false)
+  metaTitle       String?
+  metaDescription String?
+  keywords        String?
+  brandId         String?
+  categoryId      String?
+  subCategoryId   String?
+  originId        String?
+  media           Media[]
+  variations      Variation[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  Brand           Brand?       @relation(fields: [brandId], references: [id])
+  Category        Category?    @relation(fields: [categoryId], references: [id])
+  SubCategory     SubCategory? @relation(fields: [subCategoryId], references: [id])
+  Origin          Origin?      @relation(fields: [originId], references: [id])
+}
+
+model Media {
+  id        String  @id @default(uuid())
+  imageUrl  String
+  publicId  String  @unique
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Variation {
+  id        String   @id @default(cuid())
+  price     Float
+  stock     Int?
+  colorId   String?
+  productId String
+  sizeId    String?
+  color     Color?   @relation(fields: [colorId], references: [id], onDelete: SetNull)
+  size      Size?    @relation(fields: [sizeId], references: [id], onDelete: SetNull)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

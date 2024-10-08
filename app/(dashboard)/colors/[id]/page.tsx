@@ -104,9 +104,9 @@ const Page = () => {
               name="label"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Color Name</FormLabel>
+                  <FormLabel>Label</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} disabled={loading} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -122,6 +122,7 @@ const Page = () => {
                     <HexColorPicker
                       color={field.value}
                       onChange={field.onChange}
+                      hidden={loading}
                     />
                   </FormControl>
                   <FormMessage />

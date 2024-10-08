@@ -4,7 +4,9 @@ import { NextResponse } from "next/server";
 // Fetch All records
 export async function GET() {
   try {
-    const records = await prisma.subCategory.findMany();
+    const records = await prisma.subCategory.findMany({
+      include: { category: true },
+    });
     return NextResponse.json(records, { status: 200 });
   } catch (error) {
     console.error(error);
